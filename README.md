@@ -2,49 +2,6 @@
 [![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
 ### Installation
 
-You need to install the legacy version of the jesse.
-
-
-#### Linux:
-
-Use: [jesse stack installer](https://github.com/ysdede/stack-installer/blob/master/jesse-cli-ubuntu20.sh)
-
-it will install modified version of legacy jesse cli and jesse-tk. You still need to create jesse_db manually as stated in original jesse installation document.
-
-```console
-
-bash <(curl -s https://raw.githubusercontent.com/ysdede/stack-installer/master/jesse-cli-ubuntu20.sh)
-
-```
-  
-
-#### Windows:
-
-Download and install prebuilt ta-lib from [https://www.lfd.uci.edu/~gohlke/pythonlibs/](https://www.lfd.uci.edu/~gohlke/pythonlibs/)
-
-```console
-
-pip install downloaded wheel file
-
-```  
-
-install legacy jesse cli from [https://github.com/ysdede/jesse](https://github.com/ysdede/jesse)
-
-Clone this repository and install with pip.
-
-```console
-
-pip install .
-
-```
-
-or
-
-```console
-
-pip install -e git+https://github.com/ysdede/jesse-tk.git#egg=jesse-tk
-
-```
 
 ## Usage
 ### jesse-tk import-routes  
