@@ -40,6 +40,20 @@ def check_cli_config():
         # os.exit(1)
         exit()
 
+def validate_cwd() -> None:
+    """
+    make sure we're in a Jesse project
+    """
+    if not is_jesse_project:
+        print(
+            jh.color(
+                'Current directory is not a Jesse project. You must run commands from the root of a Jesse project.',
+                'red'
+            )
+        )
+        # os.exit(1)
+        exit()
+
 # create a Click group
 
 @click.group()
@@ -140,10 +154,6 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
     change = ((last_close - first_close) / first_close) * 100.0
     diff = candles[jh.key(exchange, symbol)]['candles'][-1][0] - candles[jh.key(exchange, symbol)]['candles'][-2][0]
     print(f"{exchange, symbol} Len: {len(candles[jh.key(exchange, symbol)]['candles'])}, diff: {diff/1000} secs.")
-    # print(candles[jh.key(exchange, symbol)]['candles'][-1])
-    # print(candles[jh.key(exchange, symbol)]['candles'][-2])
-
-    
 
     route = [{'exchange': exchange, 'strategy': strategy_name, 'symbol': symbol, 'timeframe': timeframe}]
 
@@ -281,20 +291,6 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
 
     table.key_value(data, 'Metrics', alignments=('left', 'right'))
 # ---------------- NEW JESSE GUI ---------------- #
-
-def validate_cwd() -> None:
-    """
-    make sure we're in a Jesse project
-    """
-    if not is_jesse_project:
-        print(
-            jh.color(
-                'Current directory is not a Jesse project. You must run commands from the root of a Jesse project.',
-                'red'
-            )
-        )
-        # os.exit(1)
-        exit()
 
 
 @cli.command()
