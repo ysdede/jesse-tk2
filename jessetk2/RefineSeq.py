@@ -22,7 +22,6 @@ from routes import routes as routes_cli
 
 class Refine:
     def __init__(self, hp_py_file, start_date, finish_date, eliminate, cpu, dd, mr, lpr, sharpe, profit, imcount, sortby='sharpe', full_reports=False):
-        print('lpr filtering enabled')
         import signal
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -102,7 +101,7 @@ class Refine:
 
                     index += 1
                     iters -= 1
-            print(f'commands: {commands}')
+            # print(f'commands: {commands}')
             processes = [Popen(cmd, shell=True, stdout=PIPE) for cmd in commands]
 
             # wait for completion
@@ -165,12 +164,20 @@ class Refine:
 
         # self.save_seq(self.sorted_results)
 
-        candidates = {
-            r['dna']: r['dna']
-            for r in self.sorted_results
-            if r['max_dd'] > self.dd and r['max_margin_ratio'] < self.mr and r['lpr'] < self.lpr and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
-            # if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
-        }
+        if 'spot' in self.exchange.lower():
+            candidates = {
+                r['dna']: r['dna']
+                for r in self.sorted_results
+                if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
+                # if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
+            }
+        else:
+            candidates = {
+                r['dna']: r['dna']
+                for r in self.sorted_results
+                if r['max_dd'] > self.dd and r['max_margin_ratio'] < self.mr and r['lpr'] < self.lpr and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
+                # if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
+            }
 
         print(f'\n\nCandidates: {len(candidates)}')
         seq_fn = f'SEQ-{self.pair}-{self.strategy}-{self.start_date}-{self.finish_date}.py'
