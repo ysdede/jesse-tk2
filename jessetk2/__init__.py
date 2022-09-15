@@ -140,8 +140,8 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
     change = ((last_close - first_close) / first_close) * 100.0
     diff = candles[jh.key(exchange, symbol)]['candles'][-1][0] - candles[jh.key(exchange, symbol)]['candles'][-2][0]
     print(f"{exchange, symbol} Len: {len(candles[jh.key(exchange, symbol)]['candles'])}, diff: {diff/1000} secs.")
-    print(candles[jh.key(exchange, symbol)]['candles'][-1])
-    print(candles[jh.key(exchange, symbol)]['candles'][-2])
+    # print(candles[jh.key(exchange, symbol)]['candles'][-1])
+    # print(candles[jh.key(exchange, symbol)]['candles'][-2])
 
     
 
