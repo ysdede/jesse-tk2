@@ -318,6 +318,87 @@ def optuna_pick(treshold1: float, treshold2:float, treshold3:float) -> None:
     op = OptunaPick(t1=treshold1, t2=treshold2, t3=treshold3)
     op.dump_best_parameters()
 
+
+@cli.command()
+@click.argument('hp_file', required=True, type=str)
+@click.argument('start_date', required=True, type=str)
+@click.argument('finish_date', required=True, type=str)
+@click.option('--eliminate/--no-eliminate', default=False,
+              help='Remove worst performing dnas at every iteration.')
+@click.option(
+    '--cpu', default=0, show_default=True,
+    help='The number of CPU cores that Jesse is allowed to use. If set to 0, it will use as many as is available on your machine.')
+@click.option(
+    '--dd', default=-90, show_default=True,
+    help='Maximum drawdown limit for filtering results. Use negative values.')
+@click.option(
+    '--mr', default=200, show_default=True,
+    help='Maximum margin ratio limit for filtering results.')
+@click.option(
+    '--lpr', default=10.0, show_default=True,
+    help='Maximum liquidation price ratio limit for filtering results.')
+@click.option(
+'--sharpe', default=-100.0, show_default=True,
+help='Minimum sharpe ratio limit for filtering results.')
+@click.option(
+    '--profit', default=-100, show_default=True,
+    help='Minimum profit for filtering results.')
+@click.option(
+    '--imcount', default=999999, show_default=True,
+    help='Number of insufficient margin events count for filtering results.')
+@click.option(
+    '--sortby', default='sharpe', show_default=True,
+    help='Metric to sort results. Alternatives: pmr, calmar')
+@click.option('--full-reports/--no-full-reports', default=False,
+              help="Generates QuantStats' HTML output with metrics reports like Sharpe ratio, Win rate, Volatility, etc., and batch plotting for visualizing performance, drawdowns, rolling statistics, monthly returns, etc.")
+def refine_seq(hp_file, start_date: str, finish_date: str, eliminate: bool, cpu: int, dd: int, mr:int, lpr:float, sharpe:float, profit:float, imcount:int, sortby:str, full_reports) -> None:
+    """
+    backtest all Sequential candidate Optuna parameters.
+    Options: --dd, --mr, --sortby [sharpe, pmr, calmar]
+
+    eg. 
+
+    jesse-tk refine-seq SEQ-file.py 2022-02-10 2022-04-12 --sortby pmr --cpu 4 --mr 40 --dd -10 --lpr 0.7
+    """
+    os.chdir(os.getcwd())
+    validate_cwd()
+    validateconfig()
+    makedirs()
+    
+    if hp_file == 'last':
+        try:
+            with open('last_seq_fn', 'r') as f:
+                hp_file = f.read()
+        except:
+            print('No last_seq_fn file found!')
+            exit()
+
+        print('Last hp file:', hp_file)
+
+    sort_options = ['sharpe', 'pmr', 'calmar', 'lpr', 'profit']  # TODO: Move to VARS
+    if sortby not in sort_options:
+        print('Available sortby options:', sort_options)
+        print('Defaulting to sharpe')
+        sortby = 'sharpe'
+
+    if not eliminate:
+        eliminate = False
+
+    if cpu > cpu_count():
+        raise ValueError(
+            f'Entered cpu cores number is more than available on this machine which is {cpu_count()}')
+    elif cpu == 0:
+        max_cpu = cpu_count()
+    else:
+        max_cpu = cpu
+    print('CPU:', max_cpu)
+
+    from jessetk2.RefineSeq import Refine
+    r = Refine(hp_file, start_date, finish_date, eliminate,
+               max_cpu, dd=dd, mr=mr, lpr=lpr, sharpe=sharpe, profit=profit, imcount=imcount, sortby=sortby, full_reports=full_reports)
+    r.run()
+
+
 @cli.command()
 # @click.argument('treshold1', required=False, type=float, default=0.001)
 # @click.argument('treshold2', required=False, type=float, default=-59.0)
@@ -442,86 +523,6 @@ def refine(dna_file, start_date: str, finish_date: str, eliminate: bool, cpu: in
     from jessetk2.RefineTh import Refine
     r = Refine(dna_file, start_date, finish_date,
                eliminate, max_cpu, full_reports)
-    r.run()
-
-
-@cli.command()
-@click.argument('hp_file', required=True, type=str)
-@click.argument('start_date', required=True, type=str)
-@click.argument('finish_date', required=True, type=str)
-@click.option('--eliminate/--no-eliminate', default=False,
-              help='Remove worst performing dnas at every iteration.')
-@click.option(
-    '--cpu', default=0, show_default=True,
-    help='The number of CPU cores that Jesse is allowed to use. If set to 0, it will use as many as is available on your machine.')
-@click.option(
-    '--dd', default=-90, show_default=True,
-    help='Maximum drawdown limit for filtering results. Use negative values.')
-@click.option(
-    '--mr', default=200, show_default=True,
-    help='Maximum margin ratio limit for filtering results.')
-@click.option(
-    '--lpr', default=10.0, show_default=True,
-    help='Maximum liquidation price ratio limit for filtering results.')
-@click.option(
-'--sharpe', default=-100.0, show_default=True,
-help='Minimum sharpe ratio limit for filtering results.')
-@click.option(
-    '--profit', default=-100, show_default=True,
-    help='Minimum profit for filtering results.')
-@click.option(
-    '--imcount', default=999999, show_default=True,
-    help='Number of insufficient margin events count for filtering results.')
-@click.option(
-    '--sortby', default='sharpe', show_default=True,
-    help='Metric to sort results. Alternatives: pmr, calmar')
-@click.option('--full-reports/--no-full-reports', default=False,
-              help="Generates QuantStats' HTML output with metrics reports like Sharpe ratio, Win rate, Volatility, etc., and batch plotting for visualizing performance, drawdowns, rolling statistics, monthly returns, etc.")
-def refine_seq(hp_file, start_date: str, finish_date: str, eliminate: bool, cpu: int, dd: int, mr:int, lpr:float, sharpe:float, profit:float, imcount:int, sortby:str, full_reports) -> None:
-    """
-    backtest all Sequential candidate Optuna parameters.
-    Options: --dd, --mr, --sortby [sharpe, pmr, calmar]
-
-    eg. 
-
-    jesse-tk refine-seq SEQ-file.py 2022-02-10 2022-04-12 --sortby pmr --cpu 4 --mr 40 --dd -10 --lpr 0.7
-    """
-    os.chdir(os.getcwd())
-    validate_cwd()
-    validateconfig()
-    makedirs()
-    
-    if hp_file == 'last':
-        try:
-            with open('last_seq_fn', 'r') as f:
-                hp_file = f.read()
-        except:
-            print('No last_seq_fn file found!')
-            exit()
-
-        print('Last hp file:', hp_file)
-
-    sort_options = ['sharpe', 'pmr', 'calmar', 'lpr', 'profit']  # TODO: Move to VARS
-    if sortby not in sort_options:
-        print('Available sortby options:', sort_options)
-        print('Defaulting to sharpe')
-        sortby = 'sharpe'
-
-    if not eliminate:
-        eliminate = False
-
-    if cpu > cpu_count():
-        raise ValueError(
-            f'Entered cpu cores number is more than available on this machine which is {cpu_count()}')
-    elif cpu == 0:
-        max_cpu = cpu_count()
-    else:
-        max_cpu = cpu
-    print('CPU:', max_cpu)
-
-    from jessetk2.RefineSeq import Refine
-    r = Refine(hp_file, start_date, finish_date, eliminate,
-               max_cpu, dd=dd, mr=mr, lpr=lpr, sharpe=sharpe, profit=profit, imcount=imcount, sortby=sortby, full_reports=full_reports)
     r.run()
 
 
