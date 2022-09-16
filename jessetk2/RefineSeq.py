@@ -225,7 +225,7 @@ class Refine:
             # Replace None with empty string
             for k, v in p.items():
                 if v is None:
-                    p[k] = ''
+                    p[k] = '--'
 
             # p = {}
             # # make a copy of r dict but round values if they are floats

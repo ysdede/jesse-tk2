@@ -6,11 +6,12 @@ import json
 from jessetk2.utils import hp_to_seq
 import csv
 import jesse.helpers as jh
+from jessetk2.Vars import DEFAULT
 
 try:
     from config import config
 except ImportError:
-    print('Check your config.py file or project folder structure. You need legacy jesse cli!')
+    print('Check your config.py file or project folder structure!')
     sys.exit(1)
 
 try:
@@ -22,10 +23,16 @@ except ImportError:
 
 
 class OptunaPick:
-    def __init__(self, t1=0.001, t2=0, t3=-90):
-        self.t1 = t1
-        self.t2 = t2
-        self.t3 = t3
+    def __init__(self, dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades):
+        self.dd = dd
+        self.mr = mr
+        self.lpr = lpr
+        self.sharpe = sharpe
+        self.calmar = calmar
+        self.serenity = serenity
+        self.profit = profit
+        self.imcount = imcount
+        self.trades = trades
 
         try:
             self.db_host = config['databases']['optuna_db_host']
@@ -55,7 +62,7 @@ class OptunaPick:
 
         self.storage = f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}/{self.db_name}"
 
-    def dump_best_parameters(self):
+    def pick(self):
         study_summaries = optuna.study.get_all_study_summaries(storage=self.storage)
         # Sort study_summaries by datetime_start
         studies_sorted = sorted(study_summaries, key=lambda x: x._study_id)
@@ -76,7 +83,8 @@ class OptunaPick:
         try:
             study_name = studies_dict[value]
             study = optuna.load_study(study_name=study_name, storage=self.storage)
-        except:
+        except Exception as e:
+            print(e)
             print('Study not found!')
             exit()
 
@@ -97,36 +105,66 @@ class OptunaPick:
         strategy = StrategyClass()
 
         for trial in trials:
-            total_profit = max_mr = None
+
             if trial.state != optuna.trial.TrialState.COMPLETE:
                 continue
 
             # Check each trial values
-            # if any(v < 0 for v in trial.values):  # 1
+            # if any(v < 0 for v in trial.values):
             #     continue
 
-            if (not trial.user_attrs['trades1']) or trial.user_attrs['trades1'] < 5:
+            # Get metrics for objective function 1
+            # We may have multiple objective functions
+            if trial.user_attrs['obj1']:
+                obj1 = trial.user_attrs['obj1']
+            else:
+                continue
+                
+        #     obj1 = {
+        #     "max_dd": metrics1["max_dd"],
+        #     "total_profit": metrics1["total_profit"],
+        #     "trades": metrics1["total_trades"],
+        #     "lpr": metrics1["lpr"],
+        #     "imcount": metrics1["insuff_margin_count"],
+        #     "min_margin": metrics1["min_margin"],
+        #     "max_margin_ratio": metrics1["max_margin_ratio"],
+        #     "sharpe": metrics1["sharpe"],
+        #     "serenity": metrics1["serenity"],
+        #     "sortino": metrics1["sortino"],
+        #     "calmar": metrics1["calmar"],
+        #     "win_rate": metrics1["win_rate"],
+        #     "paid_fees": metrics1["paid_fees"],
+        # }
+
+            # Exception for min_trades
+            # If backtest fails there'll be no trades1 attribute
+            if (not obj1['trades']) or obj1['trades'] <= self.trades:
                 continue
 
-            # Make this part customizable for each strategy
-            # It's hardcoded for k series for now.
-
-            # Total profit
-            if trial.values[0] < self.t1:
-                continue
-
-            # Max DD
-            if trial.values[1] > self.t2:
+            # filters: dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, min_trades
+            if obj1['max_dd'] and obj1['max_dd'] < self.dd:
                 continue
             
-            # try:
-            #     if trial.user_attrs['max_dd1'] < -self.t3:
-            #         continue
-            # except:
-            #     pass
+            if obj1['max_margin_ratio'] and obj1['max_margin_ratio'] > self.mr:
+                continue
+                
+            if obj1['lpr'] and obj1['lpr'] > self.lpr:
+                continue
 
-            total_profit = trial.values[0]
-            metric2 = trial.values[1]
+            if obj1['sharpe'] and obj1['sharpe'] < self.sharpe:
+                continue
+                
+            if obj1['calmar'] and obj1['calmar'] < self.calmar:
+                continue
+                
+            if obj1['serenity'] and obj1['serenity'] < self.serenity:
+                continue
+
+            if obj1['total_profit'] and obj1['total_profit'] < self.profit:
+                continue
+
+            if obj1['imcount'] and obj1['imcount'] > self.imcount:
+                continue
 
             # Statistics test are useful for some strategies!
             # mean_value = round(statistics.mean((*trial.values, trial.user_attrs['sharpe3'])), 3)
@@ -153,14 +191,13 @@ class OptunaPick:
                 # print(type(trial.values), trial.values)
 
                 # This is also hardcoded for k series for now.
-                result_line = [
-                    trial.number, f"'{hash}'",
-                    *trial.values,
-                    trial.user_attrs['max_dd1'],
-                    trial.user_attrs['sharpe1'],
-                    trial.user_attrs['trades1'],
-                    trial.user_attrs['fees1'],
-                    rounded_params]
+                result_line = [trial.number, f"'{hash}'", *trial.values]
+
+                for k, v in obj1.items():
+                    # if v:
+                    result_line.append(v)
+                    
+                result_line.append(rounded_params)
 
                 results.append(result_line)
                 parameter_list.append(trial.params)
@@ -172,18 +209,29 @@ class OptunaPick:
         print(f"Picked {len(results)} trials")
 
         # field names
-        fields = ['Trial #', 'Seq', 'Profit', 'insufMargin',
-                  'Max DD', 'Sharpe', 'Trades', 'Fees', 'HP']
+        fields = ['Trial #', 'Seq']  #, 'Profit', 'insufMargin',
+                #   'Max DD', 'Sharpe', 'Trades', 'Fees', 'HP']
+        for i in range(len(trial.values)):
+            fields.append(f"Objective {i}")
+        
+        for k, v in obj1.items():
+            # if v:
+            fields.append(k)
+        
+        fields.append('HP')
 
-        with open(f'Results-{self.db_name}-{study_name.replace(" ", "-")}.csv', 'w') as f:
+        res_fn = f'Results-{self.db_name}-{study_name.replace(" ", "-")}.csv'
+        with open(res_fn, 'w') as f:
             # using csv.writer method from CSV package
             write = csv.writer(f, delimiter='\t', lineterminator='\n')
 
             write.writerow(fields)
             write.writerows(results)
 
-        with open(f'SEQ-{self.db_name}-{study_name.replace(" ", "-")}.py', 'w') as f:
+        seq_fn = f'SEQ-{self.db_name}-{study_name.replace(" ", "-")}.py'
+        with open(seq_fn, 'w') as f:
             f.write("hps = ")
             f.write(json.dumps(candidates, indent=1))
 
-        print("Tada! Results saved to file.")
+        print(f"Results saved to {res_fn}")
+        print(f"Candidates saved to {seq_fn}")

@@ -2,6 +2,10 @@ datadir = 'jessetkdata'
 initial_test_message = 'Please wait while performing initial test...'
 csvd = '\t'  # csv delimiter
 
+DEFAULT = {'dd': -90.0, 'mr': 200.0, 'lpr': 10.0, 'sharpe': -100.0, 'calmar': -100.0, 'serenity': -100.0, 'sortino': -100.0, 'profit': -100.00, 'imcount': 999_999, 'trades': 0}
+
+USER_ATTRS = ['trades', 'dd', 'mr', 'lpr', 'sharpe', 'calmar', 'serenity', 'profit', 'imcount']
+
 Metrics = {
     'start_date': None,
     'finish_date': None,
@@ -14,7 +18,7 @@ Metrics = {
     'total_profit': 0.0,
     'max_dd': 0.0,
     'annual_return': 0.0,
-    'max_margin_ratio': 0.0,
+    'max_margin_ratio': None,
     'lpr': None,
     'pmr': None,
     'insuff_margin_count': None,
@@ -23,22 +27,22 @@ Metrics = {
     'win_rate': 0,
     'n_of_longs': 0,
     'n_of_shorts': 0,
-    'serenity': 0.0,
+    'serenity': None,
     'sharpe': None,
     'calmar': None,
     'sortino': None,
     'smart_sharpe': None,
     'smart_sortino': None,
-    'win_strk': 0.0,
-    'lose_strk': 0.0,
-    'largest_win': 0.0,
-    'largest_lose': 0.0,
+    'win_strk': None,
+    'lose_strk': None,
+    'largest_win': None,
+    'largest_lose': None,
     'n_of_wins': 0,
     'n_of_loses': 0,
-    'market_change': 0.0,
+    'market_change': None,
     'seq_hps': 'None',
     'parameters': 'None',
-    'bench_vol': 0.0,
+    'bench_vol': None,
 }
 
 refine_file_header = ['Pair',

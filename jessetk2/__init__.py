@@ -31,6 +31,7 @@ from quantstats import stats as qsstats
 
 # from jessetk import utils
 # from jessetk2.Vars import initial_test_message
+from jessetk2.Vars import DEFAULT
 
 def check_cli_config():
     ls = os.listdir('.')
@@ -294,29 +295,23 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
 
 
 @cli.command()
-@click.argument('treshold1', required=False, type=float, default=0.001)
-@click.argument('treshold2', required=False, type=float, default=3.0)
-@click.argument('treshold3', required=False, type=float, default=-35.0)
-def optuna_pick(treshold1: float, treshold2:float, treshold3:float) -> None:
-    """
-    Pick best parameters for a strategy
-
-    Parameter1 is the treshold for the first parameter (Profit for spot k series strategies)
-    
-    Parameter2 is the treshold for the second parameter (Calmar ratio for k series strategies)
-
-    Parameter3 is the treshold for the third parameter (Max. drawdown for k series strategies)
-    """
+@click.option('--dd', default=DEFAULT['dd'], show_default=True, help='Maximum drawdown limit for filtering results. Use negative values.')
+@click.option('--mr', default=DEFAULT['mr'], show_default=True, help='Maximum margin ratio limit for filtering results.')
+@click.option('--lpr', default=DEFAULT['lpr'], show_default=True, help='Maximum liquidation price ratio limit for filtering results.')
+@click.option('--sharpe', default=DEFAULT['sharpe'], show_default=True, help='Minimum Sharpe ratio limit for filtering results.')
+@click.option('--calmar', default=DEFAULT['calmar'], show_default=True, help='Minimum Calmar ratio limit for filtering results.')
+@click.option('--serenity', default=DEFAULT['serenity'], show_default=True, help='Minimum Serenity ratio limit for filtering results.')
+@click.option('--profit', default=DEFAULT['profit'], show_default=True, help='Minimum profit for filtering results.')
+@click.option('--imcount', default=DEFAULT['imcount'], show_default=True, help='Number of insufficient margin events count for filtering results.')
+@click.option('--trades', default=DEFAULT['trades'], show_default=True, help='Minimum number of trades for filtering results.')
+def optuna_pick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades):
+    """Picks the best hyperparameters from the optuna database."""
     os.chdir(os.getcwd())
     validate_cwd()
 
-    print(f"treshold1: {treshold1}")
-    print(f"treshold2: {treshold2}")
-    print(f"treshold3: {treshold3}")
-
     from jessetk2.OptunaPick import OptunaPick
-    op = OptunaPick(t1=treshold1, t2=treshold2, t3=treshold3)
-    op.dump_best_parameters()
+    op = OptunaPick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades)
+    op.pick()
 
 
 @cli.command()
