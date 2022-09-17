@@ -135,14 +135,7 @@ class Refine:
                 # print('Sorted results', len(sorted_results_prelist))
 
                 # sleep(10)
-                self.sorted_results = []
-
-                if self.eliminate:
-                    for r in sorted_results_prelist:
-                        if float(r['sharpe']) > 0:
-                            self.sorted_results.append(r)
-                else:
-                    self.sorted_results = sorted_results_prelist
+                self.sorted_results = sorted_results_prelist
 
                 utils.clear_console()
 
@@ -179,7 +172,8 @@ class Refine:
                 # if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
             }
 
-        print(f'\n\nCandidates: {len(candidates)}')
+        print(f'\nSorted_results: {len(self.sorted_results)}')
+        print(f'\nCandidates: {len(candidates)}')
         seq_fn = f'SEQ-{self.pair}-{self.strategy}-{self.start_date}-{self.finish_date}.py'
 
         with open(seq_fn, 'w') as f:
@@ -189,8 +183,16 @@ class Refine:
         with open('last_seq_fn', 'w') as f:
             f.write(seq_fn)
 
-        utils.create_csv_report(self.sorted_results,
-                                self.report_file_name, refine_file_header)
+        # Write sorted results to csv
+        import csv
+        from jessetk2.Vars import csvd
+        with open(self.report_file_name, 'w') as f:
+            w = csv.DictWriter(f, self.sorted_results[0].keys(), delimiter=csvd)
+            w.writeheader()
+            w.writerows(self.sorted_results)
+
+        # utils.create_csv_report(self.sorted_results,
+        #                         self.report_file_name, refine_file_header)
 
 
     def signal_handler(self, sig, frame):
