@@ -115,26 +115,25 @@ class OptunaPick:
 
             # Get metrics for objective function 1
             # We may have multiple objective functions
-            if trial.user_attrs['obj1']:
+            try:
                 obj1 = trial.user_attrs['obj1']
-            else:
-                continue
+            except:
+                obj1 = {
+                    'max_dd': trial.user_attrs['max_dd1'] if 'max_dd1' in trial.user_attrs else None,
+                    'total_profit': trial.user_attrs['total_profit1'] if 'total_profit1' in trial.user_attrs else None,
+                    'trades': trial.user_attrs['trades1'] if 'trades1' in trial.user_attrs else None,
+                    'lpr': trial.user_attrs['lpr'] if 'lpr' in trial.user_attrs else None,
+                    'imcount': trial.user_attrs['imcount1'] if 'imcount1' in trial.user_attrs else None,
+                    'min_margin': trial.user_attrs['min_margin'] if 'min_margin' in trial.user_attrs else None,
+                    'max_margin_ratio': trial.user_attrs['max_margin_ratio'] if 'max_margin_ratio' in trial.user_attrs else None,
+                    'sharpe': trial.user_attrs['sharpe1'] if 'sharpe1' in trial.user_attrs else None,
+                    'calmar': trial.user_attrs['calmar1'] if 'calmar1' in trial.user_attrs else None,
+                    'sortino': trial.user_attrs['sortino1'] if 'sortino1' in trial.user_attrs else None,
+                    'serenity': trial.user_attrs['serenity1'] if 'serenity1' in trial.user_attrs else None,
+                    'win_rate': trial.user_attrs['wr1'] if 'wr1' in trial.user_attrs else None,
+                    'paid_fees': trial.user_attrs['paid_fees1'] if 'paid_fees1' in trial.user_attrs else None,
+                }
                 
-        #     obj1 = {
-        #     "max_dd": metrics1["max_dd"],
-        #     "total_profit": metrics1["total_profit"],
-        #     "trades": metrics1["total_trades"],
-        #     "lpr": metrics1["lpr"],
-        #     "imcount": metrics1["insuff_margin_count"],
-        #     "min_margin": metrics1["min_margin"],
-        #     "max_margin_ratio": metrics1["max_margin_ratio"],
-        #     "sharpe": metrics1["sharpe"],
-        #     "serenity": metrics1["serenity"],
-        #     "sortino": metrics1["sortino"],
-        #     "calmar": metrics1["calmar"],
-        #     "win_rate": metrics1["win_rate"],
-        #     "paid_fees": metrics1["paid_fees"],
-        # }
 
             # Exception for min_trades
             # If backtest fails there'll be no trades1 attribute
@@ -208,11 +207,32 @@ class OptunaPick:
         results = sorted(results, key=lambda x: x[2], reverse=True)
         print(f"Picked {len(results)} trials")
 
+        if len(results) == 0:
+            print("No candidates found! Check your filters, market types (spot vs perpetual).")
+            print("eg. You are using liquidation metrics to filter out spot markets.")
+            exit()
+
         # field names
         fields = ['Trial #', 'Seq']  #, 'Profit', 'insufMargin',
                 #   'Max DD', 'Sharpe', 'Trades', 'Fees', 'HP']
-        for i in range(len(trial.values)):
-            fields.append(f"Objective {i}")
+        
+        # find first trial with COMPLETE status
+        for trial in study.trials:
+            if trial.state == optuna.trial.TrialState.COMPLETE:
+                break
+
+        print(f"{trial.values=}")
+
+        try:
+            # If study has objectives data (added with last version) read metric names and add them as csv field names
+            objectives = study.user_attrs['objectives']
+
+            for i, o in enumerate(objectives):
+                fields.append(f"Score {i} ({o['metric']})")
+        except:
+            # Otherwise use default string eg. 'Objective n'
+            for i in range(len(trial.values)):
+                fields.append(f"Score {i}")
         
         for k, v in obj1.items():
             # if v:
@@ -220,11 +240,10 @@ class OptunaPick:
         
         fields.append('HP')
 
-        res_fn = f'Results-{self.db_name}-{study_name.replace(" ", "-")}.csv'
+        res_fn = f'Pick-{self.db_name}-{study_name.replace(" ", "-")}.csv'
         with open(res_fn, 'w') as f:
             # using csv.writer method from CSV package
             write = csv.writer(f, delimiter='\t', lineterminator='\n')
-
             write.writerow(fields)
             write.writerows(results)
 

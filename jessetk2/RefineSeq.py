@@ -183,6 +183,11 @@ class Refine:
         with open('last_seq_fn', 'w') as f:
             f.write(seq_fn)
 
+        candidates_csv = []
+        for sr in sorted_results:
+            if sr['dna'] in candidates:
+                candidates_csv.append(sr)
+
         # Write sorted results to csv
         import csv
         from jessetk2.Vars import csvd
