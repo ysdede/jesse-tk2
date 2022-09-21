@@ -459,7 +459,7 @@ def pick(dna_log_file, sort_criteria, len1, len2) -> None:
         print('dna_log_file is required!')
         exit()
 
-    sort_criteria = 'pnl1' if not sort_criteria else sort_criteria
+    sort_criteria = sort_criteria or 'pnl1'
     len1 = 30 if not len1 or len1 < 0 or len1 > 10_000 else len1
     len2 = 150 if not len2 or len2 < 0 or len2 > 10_000 else len2
 
@@ -953,11 +953,11 @@ def bulk(exchange: str, symbol: str, start_date: str, workers: int) -> None:
 
     end = arrow.utcnow().floor('month').shift(months=-1)
 
-    if exchange in ['binance', 'spot']:
+    if exchange in {'binance', 'spot'}:
         exchange = 'Binance'
         market_type = 'spot'
         margin_type = None
-    elif exchange in ['binance futures', 'futures']:
+    elif exchange in {'binance futures', 'futures'}:
         exchange = 'Binance Futures'
         market_type = 'futures'
         margin_type = 'um'
@@ -1015,7 +1015,7 @@ def bulkpairs(exchange: str, start_date: str, workers: int, all) -> None:
     workers = max(workers, 64)
 
     end = arrow.utcnow().floor('month').shift(months=-1)
-    
+
     print(exchange_data[exchange], exchange_data[exchange]['market_type'])
 
     if exchange in exchange_data:
@@ -1174,7 +1174,7 @@ def old_backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json
     # register_custom_exception_handler()
     # debug flag
     config['app']['debug_mode'] = debug
-    
+
     # fee flag
     if not fee:
         for e in config['app']['trading_exchanges']:
