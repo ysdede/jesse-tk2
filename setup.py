@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name="jesse-tk2",
-    version='0.0.7',
+    version='0.0.8',
     packages=find_packages(),
     install_requires=required,
 

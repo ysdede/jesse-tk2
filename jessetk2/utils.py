@@ -564,6 +564,9 @@ def get_metrics3(console_output) -> dict:
         
         if 'Benchmark Volatility' in line:
             metrics['bench_vol'] = round(float(split(line)), 2)
+        
+        if 'Min. Balance Ratio ' in line and '|' in line:
+            metrics['mbr'] = round(float(split(line)), 4)
 
     return metrics
 
