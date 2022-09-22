@@ -2,9 +2,9 @@ datadir = 'jessetkdata'
 initial_test_message = 'Please wait while performing initial test...'
 csvd = '\t'  # csv delimiter
 
-DEFAULT = {'dd': -90.0, 'mr': 200.0, 'lpr': 10.0, 'sharpe': -100.0, 'calmar': -100.0, 'serenity': -100.0, 'sortino': -100.0, 'profit': -100.00, 'imcount': 999_999, 'trades': 0}
+DEFAULT = {'dd': -90.0, 'mr': 200.0, 'lpr': 10.0, 'sharpe': -100.0, 'calmar': -100.0, 'serenity': -100.0, 'sortino': -100.0, 'profit': -100.00, 'imcount': 999_999, 'trades': 0, 'mbr': 10.0}
 
-USER_ATTRS = ['trades', 'dd', 'mr', 'lpr', 'sharpe', 'calmar', 'serenity', 'profit', 'imcount']
+USER_ATTRS = ['trades', 'dd', 'mr', 'lpr', 'sharpe', 'calmar', 'serenity', 'profit', 'imcount', 'mbr']
 
 Metrics = {
     'start_date': None,
@@ -43,6 +43,7 @@ Metrics = {
     'seq_hps': 'None',
     'parameters': 'None',
     'bench_vol': None,
+    'mbr': None
 }
 
 refine_file_header = ['Pair',
@@ -57,6 +58,7 @@ refine_file_header = ['Pair',
                       'Max. MR',
                       'PMR',
                       'Max. LP Rate',
+                      'MBR',
                       'Insf. Margin Count',
                       'Max.DD',
                       'Annual Profit',
@@ -83,6 +85,7 @@ refine_console_header1 = ['Dna',
                           'Max.',
                           'PMR',
                           'LP',
+                          'Max.',
                           'Insff.',
                           'Max.',
                           'Annual',
@@ -109,6 +112,7 @@ refine_console_header2 = ['String',
                           'Margin %',
                           '%',
                           'Rate',
+                          'Mbr',
                           'M.Count',
                           'DD %',
                           'Return %',
@@ -127,11 +131,11 @@ refine_console_header2 = ['String',
                           'Volat. %'
                           ]
 
-refine_console_formatter = '{: <22} {: <6} {: <5} {: <7}{: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
-                           '{: <12} {: <12} {: <10} {: <8} {: <8} {: <8} {: <8}'
+refine_console_formatter = '{: <22} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8}  {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
+                           '{: <12} {: <12} {: <10} {: <8} {: <8} {: <8} {: <9}'
 
 random_console_formatter = '{: <12} {: <12} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
-                           '{: <12} {: <12} {: <10} {: <8} {: <8} {: <8}'
+                           '{: <12} {: <12} {: <10} {: <8} {: <8} {: <9}  {: <9} '
 
 random_file_header = ['Pair',  # TODO Pairs for multi routes?
                       'TF',
@@ -145,6 +149,7 @@ random_file_header = ['Pair',  # TODO Pairs for multi routes?
                       'Max. MR',
                       'PMR',
                       'Max. LP Rate',
+                      'Mbr',
                       'Insf. Margin Count',
                       'Max. DD',
                       'Annual Profit',
@@ -172,6 +177,7 @@ random_console_header1 = ['Start',
                           'Max.',
                           'PMR',
                           'LP',
+                          'Max.'
                           'Insff.',
                           'Max.',
                           'Annual',
@@ -187,7 +193,7 @@ random_console_header1 = ['Start',
                           'Losing',
                           'Paid',
                           'Market',
-                          'Benchmark'
+                          'Benchmark',
                           ]
                           
 random_console_header2 = ['Date',
@@ -199,6 +205,7 @@ random_console_header2 = ['Date',
                           'Margin %',
                           '%',
                           'Rate',
+                          'Mbr',
                           'M.Count',
                           'DD %',
                           'Return %',

@@ -23,7 +23,7 @@ except ImportError:
 
 
 class OptunaPick:
-    def __init__(self, dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades):
+    def __init__(self, dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr):
         self.dd = dd
         self.mr = mr
         self.lpr = lpr
@@ -33,6 +33,7 @@ class OptunaPick:
         self.profit = profit
         self.imcount = imcount
         self.trades = trades
+        self.mbr = mbr
 
         try:
             self.db_host = config['databases']['optuna_db_host']
@@ -123,6 +124,7 @@ class OptunaPick:
                     'total_profit': trial.user_attrs['total_profit1'] if 'total_profit1' in trial.user_attrs else None,
                     'trades': trial.user_attrs['trades1'] if 'trades1' in trial.user_attrs else None,
                     'lpr': trial.user_attrs['lpr'] if 'lpr' in trial.user_attrs else None,
+                    'mbr': trial.user_attrs['mbr'] if 'mbr' in trial.user_attrs else None,
                     'imcount': trial.user_attrs['imcount1'] if 'imcount1' in trial.user_attrs else None,
                     'min_margin': trial.user_attrs['min_margin'] if 'min_margin' in trial.user_attrs else None,
                     'max_margin_ratio': trial.user_attrs['max_margin_ratio'] if 'max_margin_ratio' in trial.user_attrs else None,
@@ -164,6 +166,12 @@ class OptunaPick:
 
             if obj1['imcount'] and obj1['imcount'] > self.imcount:
                 continue
+            
+            try:
+                if obj1['mbr'] and obj1['mbr'] > self.mbr:
+                    continue
+            except:
+                pass
 
             # Statistics test are useful for some strategies!
             # mean_value = round(statistics.mean((*trial.values, trial.user_attrs['sharpe3'])), 3)

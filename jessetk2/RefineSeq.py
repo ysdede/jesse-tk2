@@ -21,7 +21,7 @@ from importlib.metadata import version
 from routes import routes as routes_cli
 
 class Refine:
-    def __init__(self, hp_py_file, start_date, finish_date, eliminate, cpu, dd, mr, lpr, sharpe, profit, imcount, sortby='sharpe', full_reports=False):
+    def __init__(self, hp_py_file, start_date, finish_date, eliminate, cpu, dd, mr, lpr, sharpe, profit, imcount, mbr, sortby='sharpe', full_reports=False):
         import signal
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -36,6 +36,7 @@ class Refine:
         self.sharpe = sharpe
         self.profit = profit
         self.imcount = imcount
+        self.mbr = mbr
         self.sortby = sortby.replace('profit', 'total_profit')
         # Minimum is better for max lp rate, so we need to reverse the sort
         self.sort_reverse = sortby != 'lpr'
@@ -146,7 +147,7 @@ class Refine:
                     f'{index}/{self.n_of_params}\teta: {eta_formatted} | {self.pair} |'
                     f' {self.timeframe} | {self.start_date} -> {self.finish_date} |'
                     f" Sort by {self.sortby} {'reversed' if self.sort_reverse else ''} |"
-                    f" Filters: IM: {self.imcount} | MR% {self.mr}, DD% {self.dd}, LPR {self.lpr}, Sharpe {self.sharpe}, Profit: {self.profit} | Ver. {version('jesse-tk2')}")
+                    f" Filters: IM: {self.imcount} | MR% {self.mr}, DD% {self.dd}, LPR {self.lpr}, Sharpe {self.sharpe}, Profit: {self.profit} Mbr: {self.mbr} | Ver. {version('jesse-tk2')}")
 
                 self.print_tops_formatted(n=30)
 
@@ -161,7 +162,11 @@ class Refine:
             candidates = {
                 r['dna']: r['dna']
                 for r in self.sorted_results
-                if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
+                if r['max_dd'] > self.dd and
+                r['sharpe'] > self.sharpe and 
+                r['total_profit'] > self.profit and 
+                r['insuff_margin_count'] <= self.imcount and
+                r['mbr'] <= self.mbr
                 # if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
             }
         else:
@@ -205,15 +210,26 @@ class Refine:
         sys.exit(0)
 
     def import_dnas(self):
+        self.n_of_params = -1
+
         module_name = self.hp_py_file.replace('.\\', '').replace('.py', '')
         module_name = module_name.replace('/', '.').replace('.py', '')
         print(module_name)
+        try:
+            self.hps_module = importlib.import_module(module_name)
+            importlib.reload(self.hps_module)
+            self.params = [*self.hps_module.hps]  # self.hps_module.hps.keys()
+            self.n_of_params = len(self.params)
+            print(f'Imported {self.n_of_params} parameters...')
+        except Exception as e:
+            print(e)
+            exit()
 
-        self.hps_module = importlib.import_module(module_name)
-        importlib.reload(self.hps_module)
-        self.params = [*self.hps_module.hps]  # self.hps_module.hps.keys()
-        self.n_of_params = len(self.params)
-        print(f'Imported {self.n_of_params} parameters...')
+        if self.n_of_params < 1:
+            print('No candidates found. Exiting.')
+            print(f'Seq: file: {self.hp_py_file}')
+            exit()
+        
         # print('self.params', self.params)
         # sleep(5)
         
@@ -265,6 +281,7 @@ class Refine:
                     p['max_margin_ratio'],
                     p['pmr'],
                     p['lpr'],
+                    p['mbr'],
                     p['insuff_margin_count'],
                     p['max_dd'],
                     p['annual_return'],
