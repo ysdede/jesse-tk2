@@ -135,7 +135,7 @@ class OptunaPick:
                     'win_rate': trial.user_attrs['wr1'] if 'wr1' in trial.user_attrs else None,
                     'paid_fees': trial.user_attrs['paid_fees1'] if 'paid_fees1' in trial.user_attrs else None,
                 }
-                
+
 
             # Exception for min_trades
             # If backtest fails there'll be no trades1 attribute
@@ -145,19 +145,19 @@ class OptunaPick:
             # filters: dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, min_trades
             if obj1['max_dd'] and obj1['max_dd'] < self.dd:
                 continue
-            
+
             if obj1['max_margin_ratio'] and obj1['max_margin_ratio'] > self.mr:
                 continue
-                
+
             if obj1['lpr'] and obj1['lpr'] > self.lpr:
                 continue
 
             if obj1['sharpe'] and obj1['sharpe'] < self.sharpe:
                 continue
-                
+
             if obj1['calmar'] and obj1['calmar'] < self.calmar:
                 continue
-                
+
             if obj1['serenity'] and obj1['serenity'] < self.serenity:
                 continue
 
@@ -166,7 +166,7 @@ class OptunaPick:
 
             if obj1['imcount'] and obj1['imcount'] > self.imcount:
                 continue
-            
+
             try:
                 if obj1['mbr'] and obj1['mbr'] > self.mbr:
                     continue
@@ -181,11 +181,11 @@ class OptunaPick:
             rounded_params = trial.params
 
             # Inject payload HP to route
-            hp_new = {}
+            hp_new = {
+                p['name']: rounded_params[p['name']]
+                for p in strategy.hyperparameters()
+            }
 
-            # Sort hyperparameters as defined in the strategy
-            for p in strategy.hyperparameters():
-                hp_new[p['name']] = rounded_params[p['name']]
 
             rounded_params = hp_new
 
@@ -200,17 +200,14 @@ class OptunaPick:
                 # This is also hardcoded for k series for now.
                 result_line = [trial.number, f"'{hash}'", *trial.values]
 
-                for k, v in obj1.items():
-                    # if v:
-                    result_line.append(v)
-                    
+                result_line.extend(iter(obj1.values()))
                 result_line.append(rounded_params)
 
                 results.append(result_line)
                 parameter_list.append(trial.params)
 
-                # If parameters meet criteria, add to candidates
-                # if mean_value > score_treshold and std_dev < std_dev_treshold and  trial.user_attrs['sharpe3'] > 2:
+                        # If parameters meet criteria, add to candidates
+                        # if mean_value > score_treshold and std_dev < std_dev_treshold and  trial.user_attrs['sharpe3'] > 2:
 
         results = sorted(results, key=lambda x: x[2], reverse=True)
         print(f"Picked {len(results)} trials")
@@ -222,8 +219,6 @@ class OptunaPick:
 
         # field names
         fields = ['Trial #', 'Seq']  #, 'Profit', 'insufMargin',
-                #   'Max DD', 'Sharpe', 'Trades', 'Fees', 'HP']
-        
         # find first trial with COMPLETE status
         for trial in study.trials:
             if trial.state == optuna.trial.TrialState.COMPLETE:
@@ -235,17 +230,11 @@ class OptunaPick:
             # If study has objectives data (added with last version) read metric names and add them as csv field names
             objectives = study.user_attrs['objectives']
 
-            for i, o in enumerate(objectives):
-                fields.append(f"Score {i} ({o['metric']})")
+            fields.extend(f"Score {i} ({o['metric']})" for i, o in enumerate(objectives))
         except:
             # Otherwise use default string eg. 'Objective n'
-            for i in range(len(trial.values)):
-                fields.append(f"Score {i}")
-        
-        for k, v in obj1.items():
-            # if v:
-            fields.append(k)
-        
+            fields.extend(f"Score {i}" for i in range(len(trial.values)))
+        fields.extend(k for k, v in obj1.items())
         fields.append('HP')
 
         res_fn = f'Pick-{self.db_name}-{study_name.replace(" ", "-")}.csv'
