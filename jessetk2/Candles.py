@@ -7,11 +7,10 @@ from numpy import ndarray
 def get_candles_with_cache(exchange: str, symbol: str, start_date: str, finish_date: str, subs_candles: dict = {}) -> ndarray:
     if not subs_candles:
         return _get_candles_with_cache(exchange, symbol, start_date, finish_date)
-    else:
-        print(f'Using substitute candles!')
-        print(
-            f'\t\t{exchange} {symbol} -> {subs_candles["exchange"]} {subs_candles["symbol"]}')
-        return _get_candles_with_cache(subs_candles['exchange'], subs_candles['symbol'], start_date, finish_date)
+    print('Using substitute candles!')
+    print(
+        f'\t\t{exchange} {symbol} -> {subs_candles["exchange"]} {subs_candles["symbol"]}')
+    return _get_candles_with_cache(subs_candles['exchange'], subs_candles['symbol'], start_date, finish_date)
 
 
 def _get_candles_with_cache(exchange: str, symbol: str, start_date: str, finish_date: str) -> ndarray:
