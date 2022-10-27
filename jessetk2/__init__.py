@@ -108,8 +108,20 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
     except ImportError:
         extra_routes = []
 
+    try:
+        from routes import substitute_candles
+    except ImportError:
+        substitute_candles = {}
+
     print(routes_cli[0][0])
     print(routes_cli[0][1])
+
+    # if substitute_candles:
+    #     print(f'Using substitute_candles:\n\t\t {substitute_candles}, length: {len(substitute_candles)}')
+
+    print(f'substitute_candles: {"True" if substitute_candles else "False"}')
+    # print(substitute_candles['exchange'])
+    
 
     start_time = time.time()
 
@@ -128,6 +140,7 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
                     symbol,
                     start_date,
                     finish_date,
+                    substitute_candles
                 ),
             }
             extra_routes.append({'exchange': exchange, 'symbol': symbol,
@@ -147,6 +160,7 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
                 symbol,
                 start_date,
                 finish_date,
+                substitute_candles
             ),
         }
 
