@@ -120,7 +120,6 @@ class Refine:
                     print(err.decode('utf-8'))
                 except Exception as e:
                     print(e)
-                    pass
                 # exit()
                 iters_completed += 1
 
@@ -195,11 +194,7 @@ class Refine:
         with open('last_seq_fn', 'w') as f:
             f.write(seq_fn)
 
-        candidates_csv = []
-        for sr in sorted_results:
-            if sr['dna'] in candidates:
-                candidates_csv.append(sr)
-
+        candidates_csv = [sr for sr in sorted_results if sr['dna'] in candidates]
         # Write sorted results to csv
         import csv
         from jessetk2.Vars import csvd
