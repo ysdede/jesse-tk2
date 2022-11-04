@@ -321,13 +321,14 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
 @click.option('--imcount', default=DEFAULT['imcount'], show_default=True, help='Number of insufficient margin events count for filtering results.')
 @click.option('--trades', default=DEFAULT['trades'], show_default=True, help='Minimum number of trades for filtering results.')
 @click.option('--mbr', default=DEFAULT['mbr'], show_default=True, help='Maximum balance/init balance ratio limit for filtering results.')
-def optuna_pick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr):
+@click.option('--udd', default=-100.0, show_default=True, help='Minimum PNL vs capital ratio.')
+def optuna_pick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd):
     """Picks the best hyperparameters from the optuna database."""
     os.chdir(os.getcwd())
     validate_cwd()
 
     from jessetk2.OptunaPick import OptunaPick
-    op = OptunaPick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr)
+    op = OptunaPick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd)
     op.pick()
 
 
@@ -362,11 +363,14 @@ help='Minimum sharpe ratio limit for filtering results.')
     '--mbr', default=10.0, show_default=True,
     help='Maximum min balance/init balance ratio limit for filtering results.')
 @click.option(
+    '--udd', default=-100.0, show_default=True,
+    help='Minimum PNL vs capital ratio.')
+@click.option(
     '--sortby', default='sharpe', show_default=True,
     help='Metric to sort results. Alternatives: pmr, calmar')
 @click.option('--full-reports/--no-full-reports', default=False,
               help="Generates QuantStats' HTML output with metrics reports like Sharpe ratio, Win rate, Volatility, etc., and batch plotting for visualizing performance, drawdowns, rolling statistics, monthly returns, etc.")
-def refine_seq(hp_file, start_date: str, finish_date: str, eliminate: bool, cpu: int, dd: int, mr:int, lpr:float, sharpe:float, profit:float, imcount:int, mbr:float, sortby:str, full_reports) -> None:
+def refine_seq(hp_file, start_date: str, finish_date: str, eliminate: bool, cpu: int, dd: int, mr:int, lpr:float, sharpe:float, profit:float, imcount:int, mbr:float, udd:float, sortby:str, full_reports) -> None:
     """
     backtest all Sequential candidate Optuna parameters.
     Options: --dd, --mr, --sortby [sharpe, pmr, calmar]
@@ -410,7 +414,7 @@ def refine_seq(hp_file, start_date: str, finish_date: str, eliminate: bool, cpu:
 
     from jessetk2.RefineSeq import Refine
     r = Refine(hp_file, start_date, finish_date, eliminate,
-               max_cpu, dd=dd, mr=mr, lpr=lpr, sharpe=sharpe, profit=profit, imcount=imcount, mbr=mbr, sortby=sortby, full_reports=full_reports)
+               max_cpu, dd=dd, mr=mr, lpr=lpr, sharpe=sharpe, profit=profit, imcount=imcount, mbr=mbr, udd=udd, sortby=sortby, full_reports=full_reports)
     r.run()
 
 

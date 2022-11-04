@@ -21,7 +21,7 @@ from importlib.metadata import version
 from routes import routes as routes_cli
 
 class Refine:
-    def __init__(self, hp_py_file, start_date, finish_date, eliminate, cpu, dd, mr, lpr, sharpe, profit, imcount, mbr, sortby='sharpe', full_reports=False):
+    def __init__(self, hp_py_file, start_date, finish_date, eliminate, cpu, dd, mr, lpr, sharpe, profit, imcount, mbr, udd, sortby='sharpe', full_reports=False):
         import signal
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -37,6 +37,8 @@ class Refine:
         self.profit = profit
         self.imcount = imcount
         self.mbr = mbr
+        self.udd = udd
+
         self.sortby = sortby.replace('profit', 'total_profit')
         # Minimum is better for max lp rate, so we need to reverse the sort
         self.sort_reverse = sortby != 'lpr'
@@ -147,7 +149,7 @@ class Refine:
                     f'{index}/{self.n_of_params}\teta: {eta_formatted} | {self.pair} |'
                     f' {self.timeframe} | {self.start_date} -> {self.finish_date} |'
                     f" Sort by {self.sortby} {'reversed' if self.sort_reverse else ''} |"
-                    f" Filters: IM: {self.imcount} | MR% {self.mr}, DD% {self.dd}, LPR {self.lpr}, Sharpe {self.sharpe}, Profit: {self.profit} Mbr: {self.mbr} | Ver. {version('jesse-tk2')}")
+                    f" Filters: uDD: {self.udd} | IM: {self.imcount} | MR% {self.mr}, DD% {self.dd}, LPR {self.lpr}, Sharpe {self.sharpe}, Profit: {self.profit} Mbr: {self.mbr} | Ver. {version('jesse-tk2')}")
 
                 self.print_tops_formatted(n=30)
 
@@ -158,6 +160,9 @@ class Refine:
 
         # self.save_seq(self.sorted_results)
 
+        # for r in self.sorted_results:
+        #     print(type(r['udd']), r['udd'], type(self.udd ), self.udd)
+
         if 'spot' in self.exchange.lower():
             candidates = {
                 r['dna']: r['dna']
@@ -166,14 +171,16 @@ class Refine:
                 r['sharpe'] > self.sharpe and 
                 r['total_profit'] > self.profit and 
                 r['insuff_margin_count'] <= self.imcount and
-                r['mbr'] <= self.mbr
+                r['mbr'] <= self.mbr and
+                r['udd'] <= self.udd
+
                 # if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
             }
         else:
             candidates = {
                 r['dna']: r['dna']
                 for r in self.sorted_results
-                if r['max_dd'] > self.dd and r['max_margin_ratio'] < self.mr and r['lpr'] < self.lpr and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
+                if (r['udd'] > self.udd or isinstance(r['udd'], str)) and r['max_dd'] > self.dd and r['max_margin_ratio'] < self.mr and r['lpr'] < self.lpr and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
                 # if r['max_dd'] > self.dd and r['sharpe'] > self.sharpe and r['total_profit'] > self.profit and r['insuff_margin_count'] <= self.imcount
             }
 
@@ -278,6 +285,7 @@ class Refine:
                     p['n_of_longs'],
                     p['n_of_shorts'],
                     p['total_profit'],
+                    p['udd'],
                     p['max_margin_ratio'],
                     p['pmr'],
                     p['lpr'],
