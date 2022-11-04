@@ -2,7 +2,7 @@ datadir = 'jessetkdata'
 initial_test_message = 'Please wait while performing initial test...'
 csvd = '\t'  # csv delimiter
 
-DEFAULT = {'dd': -90.0, 'mr': 200.0, 'lpr': 10.0, 'sharpe': -100.0, 'calmar': -100.0, 'serenity': -100.0, 'sortino': -100.0, 'profit': -100.00, 'imcount': 999_999, 'trades': 0, 'mbr': 10.0}
+DEFAULT = {'dd': -90.0, 'mr': 200.0, 'lpr': 10.0, 'sharpe': -100.0, 'calmar': -100.0, 'serenity': -100.0, 'sortino': -100.0, 'profit': -100.00, 'imcount': 999_999, 'trades': 0, 'mbr': 10.0, 'udd': -100}
 
 USER_ATTRS = ['trades', 'dd', 'mr', 'lpr', 'sharpe', 'calmar', 'serenity', 'profit', 'imcount', 'mbr']
 
@@ -43,7 +43,8 @@ Metrics = {
     'seq_hps': 'None',
     'parameters': 'None',
     'bench_vol': None,
-    'mbr': None
+    'mbr': None,
+    'udd': None
 }
 
 refine_file_header = ['Pair',
@@ -55,6 +56,7 @@ refine_file_header = ['Pair',
                       'Longs %',
                       'Short %',
                       'Total Net Profit',
+                      'uDD',
                       'Max. MR',
                       'PMR',
                       'Max. LP Rate',
@@ -82,6 +84,7 @@ refine_console_header1 = ['Dna',
                           'Longs',
                           'Shorts',
                           'Total Net',
+                          'uDD',
                           'Max.',
                           'PMR',
                           'LP',
@@ -109,6 +112,7 @@ refine_console_header2 = ['String',
                           '%',
                           '%',
                           'Profit %',
+                          '%',
                           'Margin %',
                           '%',
                           'Rate',
@@ -131,10 +135,10 @@ refine_console_header2 = ['String',
                           'Volat. %'
                           ]
 
-refine_console_formatter = '{: <22} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8}  {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
+refine_console_formatter = '{: <22} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8}  {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
                            '{: <12} {: <12} {: <10} {: <8} {: <8} {: <8} {: <9}'
 
-random_console_formatter = '{: <12} {: <12} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
+random_console_formatter = '{: <12} {: <12} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
                            '{: <12} {: <12} {: <10} {: <8} {: <8} {: <9}  {: <9} '
 
 random_file_header = ['Pair',  # TODO Pairs for multi routes?
@@ -146,6 +150,7 @@ random_file_header = ['Pair',  # TODO Pairs for multi routes?
                       'Longs %',
                       'Short %',
                       'Total Net Profit',
+                      'uDD',
                       'Max. MR',
                       'PMR',
                       'Max. LP Rate',
@@ -174,6 +179,7 @@ random_console_header1 = ['Start',
                           'Longs',
                           'Shorts',
                           'Total Net',
+                          'uDD',
                           'Max.',
                           'PMR',
                           'LP',
@@ -202,6 +208,7 @@ random_console_header2 = ['Date',
                           '%',
                           '%',
                           'Profit %',
+                          '%',
                           'Margin %',
                           '%',
                           'Rate',

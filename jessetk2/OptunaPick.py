@@ -23,7 +23,7 @@ except ImportError:
 
 
 class OptunaPick:
-    def __init__(self, dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr):
+    def __init__(self, dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd):
         self.dd = dd
         self.mr = mr
         self.lpr = lpr
@@ -34,6 +34,7 @@ class OptunaPick:
         self.imcount = imcount
         self.trades = trades
         self.mbr = mbr
+        self.udd = udd
 
         try:
             self.db_host = config['databases']['optuna_db_host']
@@ -126,6 +127,7 @@ class OptunaPick:
                     'lpr': trial.user_attrs['lpr'] if 'lpr' in trial.user_attrs else None,
                     'mbr': trial.user_attrs['mbr'] if 'mbr' in trial.user_attrs else None,
                     'imcount': trial.user_attrs['imcount1'] if 'imcount1' in trial.user_attrs else None,
+                    'udd': trial.user_attrs['udd1'] if 'udd1' in trial.user_attrs else None,
                     'min_margin': trial.user_attrs['min_margin'] if 'min_margin' in trial.user_attrs else None,
                     'max_margin_ratio': trial.user_attrs['max_margin_ratio'] if 'max_margin_ratio' in trial.user_attrs else None,
                     'sharpe': trial.user_attrs['sharpe1'] if 'sharpe1' in trial.user_attrs else None,
@@ -143,6 +145,9 @@ class OptunaPick:
                 continue
 
             # filters: dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, min_trades
+            if obj1['udd'] and obj1['udd'] < self.udd:
+                continue
+
             if obj1['max_dd'] and obj1['max_dd'] < self.dd:
                 continue
             
