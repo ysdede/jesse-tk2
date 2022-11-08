@@ -16,6 +16,7 @@ Metrics = {
     'dna': 'None',
     'total_trades': None,
     'total_profit': 0.0,
+    'udd': None,
     'max_dd': 0.0,
     'annual_return': 0.0,
     'max_margin_ratio': None,
@@ -44,7 +45,6 @@ Metrics = {
     'parameters': 'None',
     'bench_vol': None,
     'mbr': None,
-    'udd': None
 }
 
 refine_file_header = ['Pair',
@@ -56,14 +56,15 @@ refine_file_header = ['Pair',
                       'Longs %',
                       'Short %',
                       'Total Net Profit',
-                      'uDD',
+                      'Annual Profit',
                       'Max. MR',
                       'PMR',
                       'Max. LP Rate',
                       'MBR',
                       'Insf. Margin Count',
+                      'uDD',
                       'Max.DD',
-                      'Annual Profit',
+                      'Benchmark Volatility',
                       'Winrate',
                       'Serenity',
                       'Sharpe',
@@ -75,8 +76,7 @@ refine_file_header = ['Pair',
                       'Num. of Wins',
                       'Num. of Losses',
                       'Paid Fees',
-                      'Market Change',
-                      'Benchmark Volatility'
+                      'Market Change'
                       ]
 
 refine_console_header1 = ['Dna',
