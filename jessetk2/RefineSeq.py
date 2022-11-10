@@ -286,6 +286,7 @@ class Refine:
                     p['n_of_shorts'],
                     p['total_profit'],
                     p['udd'],
+                    p['ppudd'],
                     p['max_margin_ratio'],
                     p['pmr'],
                     p['lpr'],
