@@ -261,6 +261,7 @@ def print_tops_formatted(frmt, header1, header2, tr):
                     r['n_of_shorts'],
                     r['total_profit'],
                     r['udd'],
+                    r['ppudd'],
                     r['max_margin_ratio'],
                     r['pmr'],
                     r['lpr'],
@@ -410,6 +411,7 @@ def create_csv_report(sorted_results, filename, header):
                     f"{srl['n_of_shorts']}{csvd}"
                     f"{srl['total_profit']}{csvd}"
                     f"{srl['udd']}{csvd}"
+                    f"{srl['ppudd']}{csvd}"
                     f"{srl['max_margin_ratio']}{csvd}"
                     f"{srl['pmr']}{csvd}"
                     f"{srl['lpr']}{csvd}"
@@ -573,6 +575,9 @@ def get_metrics3(console_output) -> dict:
         
         if 'uDD Ratio ' in line and '|' in line:
             metrics['udd'] = round(float(split(line)), 2)
+
+        if 'ppudd Ratio ' in line and '|' in line:
+            metrics['ppudd'] = round(float(split(line)), 2)
 
     return metrics
 

@@ -2,7 +2,7 @@ datadir = 'jessetkdata'
 initial_test_message = 'Please wait while performing initial test...'
 csvd = '\t'  # csv delimiter
 
-DEFAULT = {'dd': -90.0, 'mr': 200.0, 'lpr': 10.0, 'sharpe': -100.0, 'calmar': -100.0, 'serenity': -100.0, 'sortino': -100.0, 'profit': -100.00, 'imcount': 999_999, 'trades': 0, 'mbr': 10.0, 'udd': -100}
+DEFAULT = {'dd': -90.0, 'mr': 200.0, 'lpr': 10.0, 'sharpe': -100.0, 'calmar': -100.0, 'serenity': -100.0, 'sortino': -100.0, 'profit': -100.00, 'imcount': 999_999, 'trades': 0, 'mbr': 10.0, 'udd': -100, 'ppudd': -100}
 
 USER_ATTRS = ['trades', 'dd', 'mr', 'lpr', 'sharpe', 'calmar', 'serenity', 'profit', 'imcount', 'mbr']
 
@@ -17,6 +17,7 @@ Metrics = {
     'total_trades': None,
     'total_profit': 0.0,
     'udd': None,
+    'ppudd': None,
     'max_dd': 0.0,
     'annual_return': 0.0,
     'max_margin_ratio': None,
@@ -63,6 +64,7 @@ refine_file_header = ['Pair',
                       'MBR',
                       'Insf. Margin Count',
                       'uDD',
+                      'pudd',
                       'Max.DD',
                       'Benchmark Volatility',
                       'Winrate',
@@ -85,6 +87,7 @@ refine_console_header1 = ['Dna',
                           'Shorts',
                           'Total Net',
                           'uDD',
+                          'ppuDD',
                           'Max.',
                           'PMR',
                           'LP',
@@ -113,6 +116,7 @@ refine_console_header2 = ['String',
                           '%',
                           'Profit %',
                           '%',
+                          'ratio',
                           'Margin %',
                           '%',
                           'Rate',
@@ -135,7 +139,7 @@ refine_console_header2 = ['String',
                           'Volat. %'
                           ]
 
-refine_console_formatter = '{: <22} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8}  {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
+refine_console_formatter = '{: <22} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
                            '{: <12} {: <12} {: <10} {: <8} {: <8} {: <8} {: <9}'
 
 random_console_formatter = '{: <12} {: <12} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
