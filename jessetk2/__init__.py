@@ -394,7 +394,7 @@ def refine_seq(hp_file, start_date: str, finish_date: str, eliminate: bool, cpu:
 
         print('Last hp file:', hp_file)
 
-    sort_options = ['sharpe', 'pmr', 'calmar', 'lpr', 'profit', 'udd']  # TODO: Move to VARS
+    sort_options = ['sharpe', 'pmr', 'calmar', 'lpr', 'profit', 'udd', 'ppudd']  # TODO: Move to VARS
     if sortby not in sort_options:
         print('Available sortby options:', sort_options)
         print('Defaulting to sharpe')
