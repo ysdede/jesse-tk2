@@ -262,6 +262,7 @@ def print_tops_formatted(frmt, header1, header2, tr):
                     r['total_profit'],
                     r['udd'],
                     r['ppudd'],
+                    r['udd_stop_count'],
                     r['max_margin_ratio'],
                     r['pmr'],
                     r['lpr'],
@@ -366,6 +367,7 @@ def print_random_tops(sr, top_n):
                 r['n_of_shorts'],
                 r['total_profit'],
                 r['udd'],
+                r['udd_stop_count'],
                 r['max_margin_ratio'],
                 r['pmr'],
                 r['lpr'],
@@ -578,6 +580,9 @@ def get_metrics3(console_output) -> dict:
 
         if 'ppudd Ratio ' in line and '|' in line:
             metrics['ppudd'] = round(float(split(line)), 2)
+
+        if 'udd stop Count ' in line and '|' in line:
+            metrics['udd_stop_count'] = round(float(split(line)))
 
     return metrics
 

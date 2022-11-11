@@ -287,6 +287,7 @@ class Refine:
                     p['total_profit'],
                     p['udd'],
                     p['ppudd'],
+                    p['udd_stop_count'],
                     p['max_margin_ratio'],
                     p['pmr'],
                     p['lpr'],
@@ -308,6 +309,30 @@ class Refine:
                     p['market_change'],
                     p['bench_vol']
                     ))
+
+
+    def save_dnas(self, sorted_results, dna_fn=None):
+
+        if not dna_fn:
+            dna_fn = f'{self.jessetkdir}/dnafiles/{self.pair} {self.start_date} {self.finish_date}.py'
+
+        jessetk2.utils.remove_file(dna_fn)
+
+        with open(dna_fn, 'w', encoding='utf-8') as f:
+            self.write_dna_file(f, sorted_results)
+
+    def write_dna_file(self, f, sorted_results):
+        f.write('dnas = [\n')
+
+        for srr in sorted_results:
+            for dnac in self.dnas:
+                if srr['dna'] == dnac[0]:
+                    f.write(str(dnac) + ',\n')
+
+        f.write(']\n')
+        f.flush()
+        os.fsync(f.fileno())
+
 
     # def print_tops_formatted(self):
     #     print(
@@ -356,25 +381,3 @@ class Refine:
     #                 p['n_of_loses'],
     #                 p['paid_fees'],
     #                 p['market_change']))
-
-    def save_dnas(self, sorted_results, dna_fn=None):
-
-        if not dna_fn:
-            dna_fn = f'{self.jessetkdir}/dnafiles/{self.pair} {self.start_date} {self.finish_date}.py'
-
-        jessetk2.utils.remove_file(dna_fn)
-
-        with open(dna_fn, 'w', encoding='utf-8') as f:
-            self.write_dna_file(f, sorted_results)
-
-    def write_dna_file(self, f, sorted_results):
-        f.write('dnas = [\n')
-
-        for srr in sorted_results:
-            for dnac in self.dnas:
-                if srr['dna'] == dnac[0]:
-                    f.write(str(dnac) + ',\n')
-
-        f.write(']\n')
-        f.flush()
-        os.fsync(f.fileno())
