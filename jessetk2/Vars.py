@@ -18,6 +18,7 @@ Metrics = {
     'total_profit': 0.0,
     'udd': None,
     'ppudd': None,
+    'udd_stop_count': None,
     'max_dd': 0.0,
     'annual_return': 0.0,
     'max_margin_ratio': None,
@@ -65,6 +66,7 @@ refine_file_header = ['Pair',
                       'Insf. Margin Count',
                       'uDD',
                       'pudd',
+                      'udd stop count',
                       'Max.DD',
                       'Benchmark Volatility',
                       'Winrate',
@@ -88,6 +90,7 @@ refine_console_header1 = ['Dna',
                           'Total Net',
                           'uDD',
                           'ppuDD',
+                          'udd stop',
                           'Max.',
                           'PMR',
                           'LP',
@@ -117,6 +120,7 @@ refine_console_header2 = ['String',
                           'Profit %',
                           '%',
                           'ratio',
+                          'Count',
                           'Margin %',
                           '%',
                           'Rate',
@@ -139,7 +143,7 @@ refine_console_header2 = ['String',
                           'Volat. %'
                           ]
 
-refine_console_formatter = '{: <22} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
+refine_console_formatter = '{: <22} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
                            '{: <12} {: <12} {: <10} {: <8} {: <8} {: <8} {: <9}'
 
 random_console_formatter = '{: <12} {: <12} {: <6} {: <5} {: <7} {: <12} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} {: <10} {: <8} {: <8} {: <8} {: <8} {: <8} {: <8} ' \
