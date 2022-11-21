@@ -23,7 +23,7 @@ except ImportError:
 
 
 class OptunaPick:
-    def __init__(self, dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd):
+    def __init__(self, dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd, udd_count):
         self.dd = dd
         self.mr = mr
         self.lpr = lpr
@@ -35,6 +35,7 @@ class OptunaPick:
         self.trades = trades
         self.mbr = mbr
         self.udd = udd
+        self.udd_count = udd_count
 
         try:
             self.db_host = config['databases']['optuna_db_host']
@@ -170,6 +171,9 @@ class OptunaPick:
                 continue
 
             if obj1['imcount'] and obj1['imcount'] > self.imcount:
+                continue
+
+            if obj1['udd_stop_count'] and obj1['udd_stop_count'] > self.udd_count:
                 continue
             
             try:
