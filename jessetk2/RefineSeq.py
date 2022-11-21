@@ -39,9 +39,10 @@ class Refine:
         self.mbr = mbr
         self.udd = udd
 
-        self.sortby = sortby.replace('profit', 'total_profit')
-        # Minimum is better for max lp rate, so we need to reverse the sort
-        self.sort_reverse = sortby != 'lpr'
+        sortby = sortby.lower().replace('profit', 'total_profit').replace('udd_count', 'udd_stop_count').replace('uddcount', 'udd_stop_count')
+        self.sortby = sortby
+
+        self.sort_reverse = sortby in ['lpr', 'foo_bar']
         self.fr = ' --full-reports' if full_reports else ''
         self.jessetkdir = datadir
         self.anchor = 'DNA!'
