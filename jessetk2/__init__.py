@@ -322,13 +322,14 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
 @click.option('--trades', default=DEFAULT['trades'], show_default=True, help='Minimum number of trades for filtering results.')
 @click.option('--mbr', default=DEFAULT['mbr'], show_default=True, help='Maximum balance/init balance ratio limit for filtering results.')
 @click.option('--udd', default=-100.0, show_default=True, help='Minimum PNL vs capital ratio.')
-def optuna_pick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd):
+@click.option('--udd_count', default=-100.0, show_default=True, help='Udd stop event count.')
+def optuna_pick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd, udd_count):
     """Picks the best hyperparameters from the optuna database."""
     os.chdir(os.getcwd())
     validate_cwd()
 
     from jessetk2.OptunaPick import OptunaPick
-    op = OptunaPick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd)
+    op = OptunaPick(dd, mr, lpr, sharpe, calmar, serenity, profit, imcount, trades, mbr, udd, udd_count)
     op.pick()
 
 
@@ -394,7 +395,8 @@ def refine_seq(hp_file, start_date: str, finish_date: str, eliminate: bool, cpu:
 
         print('Last hp file:', hp_file)
 
-    sort_options = ['sharpe', 'pmr', 'calmar', 'lpr', 'profit', 'udd', 'ppudd']  # TODO: Move to VARS
+    sort_options = ['sharpe', 'pmr', 'calmar', 'lpr', 'profit', 'udd', 'ppudd', 'uddcount', 'udd_count']  # TODO: Move to VARS
+    
     if sortby not in sort_options:
         print('Available sortby options:', sort_options)
         print('Defaulting to sharpe')
