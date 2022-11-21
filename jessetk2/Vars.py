@@ -18,7 +18,7 @@ Metrics = {
     'total_profit': 0.0,
     'udd': None,
     'ppudd': None,
-    'udd_stop_count': None,
+    'udd_stop_count': 0,
     'max_dd': 0.0,
     'annual_return': 0.0,
     'max_margin_ratio': None,
