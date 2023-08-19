@@ -257,6 +257,16 @@ def backtest(start_date: str, finish_date: str, debug: bool, csv: bool, json: bo
     generate_json=json,
     hyperparameters=hp_new)
     print('\n')
+    
+    if 'net_profit' not in backtest_data['metrics']:
+        backtest_data['metrics']['net_profit'] = 0
+
+    if 'net_profit_pct' not in backtest_data['metrics']:
+        backtest_data['metrics']['net_profit_pct'] = 0
+
+    print(backtest_data['metrics'])
+    print(backtest_data)
+
     data = portfolio_metrics(backtest_data['metrics'])
     data.append(['Market Change', f"{str(round(change, 2))}%"])
 
